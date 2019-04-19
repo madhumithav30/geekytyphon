@@ -1,0 +1,791 @@
+#include<iostream.h>
+#include<fstream.h>
+#include<string.h>
+#include<conio.h>
+#include<stdio.h>
+#include<stdlib.h>
+
+void Instruct();
+void ShowHeader();
+void ShowMenu();
+void ReturnLevel(int);
+void SelectWord();
+int LetterFill(char,char*);
+void Hangman(int,int);
+void Game();
+char input();
+void DispAll();
+void DispP();
+
+//global variable//
+const int MaxL=30;
+int NoOfTries=0;
+char localword[30],c;
+int NoWrongGuess=0;
+int level;
+int count=0;
+int flag=0,flag1=0;
+
+fstream fout,f2;
+
+class User
+{ int reg_no;
+  char username[20];
+  char password[20];
+  public:
+  void Enter();
+  int RetNo() { return reg_no; }
+  char *RetUsnm() { return username; }
+  char *RetPw() { return password; }
+};
+void User::Enter()
+{ cout<<"Enter USername:"<<endl;
+  gets(username);
+  cout<<"Enter Password:"<<endl;
+  gets(password);
+}
+
+class Words
+{ char l1[20];
+  char l2[20];
+  char l3[20];
+  public:
+	void inl1();
+	void inl2();
+	void inl3();
+		char *oul1()  {return l1;}
+		char *oul2()  {return l2;}
+		char *oul3()  {return l3;}
+ 
+
+}Wr;
+
+void Words::inl1()
+{ cout<<"Enter the word you want to store in LEVEL I cat"<<endl;
+  gets(l1);
+
+
+}
+void Words::inl2()
+{ cout<<"Enter the word you want to store in LEVEL II cat"<<endl;
+  gets(l2);
+
+}
+void Words::inl3()
+{ cout<<"Enter the word you want to store in LEVEL III cat"<<endl;
+  gets(l3);
+
+}
+
+class FX
+{                   int pl_no;
+                    char name[25];
+		 public:
+		   float score;
+		   int GivPlno() { return pl_no; }
+		   void get_input();
+		   void show();
+		   void get_sc();
+		   char *RetNm(){ return name;  }
+}fileobj,ob,ob1;
+fstream fa,fb,fc;
+int pos,n;
+void FX::get_input()
+{ cout<<"Have you already played this game? (y/n)"<<endl;
+  char ans;  int x1;
+  cin>>ans;
+  if(ans=='y'||ans=='Y')
+  { cout<<"Enter your Unique Player Number"<<endl;
+    cin>>x1;
+    fc.open("Records.dat",ios::binary|ios::in);
+    while(fc.read((char*)&ob,sizeof(fileobj)))
+    { if(x1==fileobj.GivPlno())
+      {cout<<"Your account exists.Continue with game "<<endl;
+      fileobj.show();
+      cout<<"Continue..."<<endl;
+      fc.seekp(-1*sizeof(fileobj),ios::cur);
+    }
+    fc.write((char*)&fileobj,sizeof(fileobj));
+  }
+  }
+  else
+   {
+
+
+  fa.open("Records.dat",ios::binary|ios::in|ios::out|ios::app);
+  cout<<"Enter your Name:";
+  gets(name);
+  fa.seekg(0,ios::end);
+  pos=fa.tellg();
+  n=pos/sizeof(fileobj);
+
+  if(n==0)
+  { n=1;
+   cout<<"You have successfully created a record in the game "<<name<<" ";
+   pl_no=n;
+   cout<<"\nPlayer Number is "<<pl_no;
+
+   fa.write((char*)&fileobj,sizeof(fileobj));
+  }
+  else
+  { cout<<"You have successfully created a record in the game "<<name<<" ";
+    pl_no=(n+1);
+    cout<<"Player Number is "<<pl_no;
+
+    fa.write((char*)&fileobj,sizeof(fileobj));
+  }
+  fa.close();
+}
+}
+
+
+
+void FX::show()
+{ fb.open("Records.dat",ios::in|ios::out|ios::binary);
+
+ int scrnt=0;
+ if(scrnt==1){
+cout<<"Details Of Player"<<endl;
+scrnt=0; }
+ cout<<"Number->  ::"<<pl_no<<endl;
+ cout<<"Name->    ::"<<name<<endl;
+ get_sc();
+  cout<<"Score->   ::"<<score<<endl;
+ scrnt++;
+ fb.close();
+}
+
+void FX::get_sc()
+{ if(NoWrongGuess==NoOfTries)
+	  score=0;
+  else if(NoWrongGuess<NoOfTries)
+{
+		switch(NoOfTries){
+		case 4:  score=(NoOfTries-NoWrongGuess)*400;
+					break;
+		case 5:  score=(NoOfTries-NoWrongGuess)*200;
+					break;
+		case 6: score =(NoOfTries-NoWrongGuess)*100;
+					break;
+		default: break;
+	  }
+  }
+}
+
+void ShowMenu()
+{
+	int cho;
+	 char coh;
+	do{
+ShowHeader();
+cout<<"Select an Option: ";
+cout<<"\n1. Start Game";
+cout<<"\n2. How to play";
+cout<<"\n3. To Display Details of All Player with Score";
+cout<<"\n4. To Display Record of particular Player";
+cout<<"\n5. Exit";
+cout<<endl<<"Enter your Choice: ";
+cin>>cho;
+switch(cho)
+{ case 1:
+	{ cout<<"Game Call\n";
+	  Game();
+	  break;
+	}
+  case 2:
+	{ cout<<"Instructions To Play\n";
+	  Instruct();
+	  break;
+	}
+  case 3:
+       {  cout<<"Details of All Players\n";
+	  DispAll();
+	  break;
+       }
+  case 4:
+       { cout<<"Details of a Particular Player\n";
+	 DispP();
+	 break;
+       }
+  case 5:
+       { cout<<"\tExited Successfully";
+	 getch();
+	 exit(0);
+       }
+  default: cout<<"Invalid Input"<<endl;
+}
+
+cout<<"DO U WANT TO CONTINUE(Y/N)"<<endl;
+cin>>coh;
+}while(coh=='y'||coh=='Y');
+
+}
+
+
+
+void SelectWord()
+{int Word,x ;                // will hold the subscript of the chosen word
+  randomize();
+  cout<<"\nEnter the level you want to play the game with:"<<endl;
+  cin>>level;
+  if(level==1)
+  { cout<<"LEVEL I- C++ Concepts "<<endl;
+    ifstream a("LEVEL1.dat",ios::binary);
+
+if(a)
+
+{
+
+srand((unsigned)time( NULL ));                                                    // use time as a seed
+a.seekg(0,ios::end);
+x=a.tellg();
+count=(x/sizeof(Wr));
+Word = rand() % count++;
+a.seekg(Word*sizeof(Wr),ios::beg);
+a. read((char*)&Wr,sizeof(Wr));
+strcpy(localword,Wr.oul1());
+
+
+}
+else
+cout<<"Files not found";
+ }
+else if(level==2)
+  {      cout<<"LEVEL II- Countries "<<endl;
+	 ifstream c("LEVEL2.dat",ios::binary);
+if(c)
+{
+ srand((unsigned)time( NULL )); // use time as a seed
+c.seekg(0,ios::end);
+x=c.tellg();
+count=(x/sizeof(Wr));
+ Word = rand() % count++;
+c.seekg(Word*sizeof(Wr),ios::beg);
+c. read((char*)&Wr,sizeof(Wr));
+
+strcpy(localword,Wr.oul2());
+
+}
+else
+cout<<"Files not found"<<endl;
+
+
+
+
+ }
+ else if(level==3)
+  {  cout<<"LEVEL III- Wonders Of The World "<<endl;
+    ifstream b("LEVEL3.dat",ios::binary);
+if(b)
+{
+ srand((unsigned)time( NULL ));                              // use time as a seed
+b.seekg(0,ios::end);
+x=b.tellg();
+count=(x/sizeof(Wr));
+Word = rand() % count++;
+b.seekg(Word*sizeof(Wr),ios::beg);
+b. read((char*)&Wr,sizeof(Wr));
+strcpy(localword,Wr.oul3());
+
+}
+else
+cout<<"Files not found"<<endl;
+
+ }
+}
+void Game()
+{int i;
+ fileobj.get_input();
+    SelectWord();
+    ShowHeader();
+    char letter;
+    char UnKnown[20];
+
+
+
+for ( i=0;i<strlen(localword);i++)
+ {
+	  UnKnown[i]='*';
+
+ }
+UnKnown[i]='\0';
+cout<<"Level : ";
+cout<<level<<endl;
+ReturnLevel(level);
+cout<<" No of Tries: "<<NoOfTries<<" "<<endl;
+
+while (NoWrongGuess<NoOfTries)          //condition for running program
+ {   Hangman(NoWrongGuess,NoOfTries);
+     cout<<"Now,Guess the rest!!!!!!!"<<' '<<UnKnown;
+
+	letter=input();
+	if(LetterFill(letter,UnKnown)==1)           //if user provides wrong guess
+	 { cout<<"\nGood Guess!!!!!"<<"\n you have  guessed the  letter";
+		   cout<<" \nNow you have "<<' '<<NoOfTries-NoWrongGuess<<" tries left.";
+
+
+		    if (strcmpi(localword,UnKnown) == 0)
+			{
+			  cout<<endl<<"\nYeah!!!!\n"<<" You survived and won!!!!\n";
+			  cout<<" The word was:\t";
+			  cout<<localword<<endl;
+			  cout<<"\nYOUR SCORE\n";
+			  fileobj.show();
+			  cout<<endl;
+			    return;
+			    }
+}
+else
+{cout<<"\nBad guess:("<<"\nBetter luck next time";
+NoWrongGuess++;
+cout<<"\n Now you have "<<' '<<NoOfTries-NoWrongGuess<<" tries left.\n";
+
+
+
+}
+
+}
+
+if(NoWrongGuess == NoOfTries)                 //condition for user to lose
+{
+cout<<endl<<"\nSorry, you lose...you've been hanged!!!!!!!!!";
+  Hangman(NoWrongGuess,NoOfTries);
+					  // to display the score of the player
+cout<<" The word was: "<<localword<<endl;
+}cout<<"\nYOUR SCORE\n";
+
+fileobj.show();
+f2.open("Records.dat",ios::binary|ios::out);
+f2.write((char*)&fileobj,sizeof(fileobj));
+f2.close();
+ 
+}
+
+void Hangman(int NoWrongGuess,int NoOfTries)
+ {
+ if(NoOfTries==6)
+    { if(NoWrongGuess==6)
+      {
+  // The \\ will translate as '\' because it is a special char
+  cout<<endl<<endl
+   <<"   +----+     "<<endl
+   <<"   |    |     "<<endl
+   <<"   |    O     "<<endl
+   <<"   |   /|\\   "<<endl
+   <<"   |   / \\   "<<endl
+   <<"   |You are  Dead "<<endl
+   <<"  ============"<<endl<<endl;
+     }
+ else if(NoWrongGuess==5)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |   /|\\ "<<endl
+   <<"   |     \\ "<<endl
+   <<"   |       "<<endl
+   <<"  ============"<<endl<<endl;
+ }
+ else if(NoWrongGuess==4)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |   /|\\ "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ else if(NoWrongGuess==3)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |   /|  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ else if(NoWrongGuess==2)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ else if(NoWrongGuess==1)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ }
+else if(NoOfTries==5)
+{  if(NoWrongGuess==5)
+ {
+  // The \\ will translate as '\' because it is a special char
+  cout<<endl<<endl
+   <<"   +----+     "<<endl
+   <<"   |    |     "<<endl
+   <<"   |    O     "<<endl
+   <<"   |   /|\\   "<<endl
+   <<"   |   / \\   "<<endl
+   <<"   |Your Dead "<<endl
+   <<"  ============"<<endl<<endl;
+ }
+
+ else if(NoWrongGuess==4)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |   /|\\ "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ else if(NoWrongGuess==3)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |   /|  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ else if(NoWrongGuess==2)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ else if(NoWrongGuess==1)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ }
+else if(NoOfTries==4)
+{if(NoWrongGuess==4)
+ {
+  // The \\ will translate as '\' because it is a special char
+  cout<<endl<<endl
+   <<"   +----+     "<<endl
+   <<"   |    |     "<<endl
+   <<"   |    O     "<<endl
+   <<"   |   /|\\   "<<endl
+   <<"   |   / \\   "<<endl
+   <<"   |You are  Dead "<<endl
+   <<"  ============"<<endl<<endl;
+ }
+
+ else if(NoWrongGuess==3)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |   /|\\ "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ else if(NoWrongGuess==2)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |    O  "<<endl
+   <<"   |   /|  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+
+ else if(NoWrongGuess==1)
+ {
+  cout<<endl<<endl
+   <<"   +----+  "<<endl
+   <<"   |    |  "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"   |       "<<endl
+   <<"  ============="<<endl<<endl;
+ }
+ }
+}
+
+
+
+int LetterFill(char guess, char guessword[20])
+{int i;
+  int matches=0;
+  for ( i=0; i<strlen(localword);i++)
+	{ if (guess==guessword[i])
+		 return 0;
+	  else if (guess==localword[i])
+		  {
+			 guessword[i] = guess;
+
+			 matches=1;
+		  }
+	 }
+return matches;
+
+}
+
+void ShowHeader()
+{
+cout<<endl<<"+--------------------------------------------------------------- --------------+";
+cout<<endl<<"| Hangman Game by Abirami-Amrita-Madhumitha-Rashmika-XII-A |";
+cout<<endl<<"+--------------------------------------------------------------- --------------+";
+cout<<endl;
+ return;
+}
+
+void Instruct()
+{ ShowHeader();
+cout<<"Here are  the Instructions to  play the Game.."<<endl;
+cout<<"* In This game you are expected to choose a particular word."<<endl;
+cout<<"* Choose a single character randomly to be filled in the blank spaces."<<endl;
+cout<<"* If your guessed letter is right ,you may proceed."<<endl;
+cout<<"* Keep In Track with the number of tries you are left with."<<endl;
+cout<<"* You Can View Your Score from the Menu Options given in Main Menu."<<endl;
+cout<<"* ALL THE BEST PLAYER!!!"<<endl;
+cout<<"Press any key to go back to main menu"<<endl;
+getch();
+ShowMenu();
+}
+
+
+void ReturnLevel(int level)
+{if(level==1)
+ NoOfTries=6;
+ else if(level==2)
+NoOfTries=5;
+else if(level==3)
+NoOfTries=4;
+else
+{
+ShowHeader();
+cout<<"Invalid Level Selected";
+getch();
+exit(1);
+clrscr();
+}
+
+}
+
+void DispAll()
+{   FX ob;
+    clrscr();
+    cout<<"Displaying All Records"<<endl;
+    fout.open("Records.dat",ios::in|ios::binary);
+    if(!fout)
+    { cout<<"File Open Error";
+      getch();
+      return;
+    }
+    else
+    { fout.read((char*)&ob,sizeof(ob));
+      while(!fout.eof())
+      { ob.show();
+	cout<<"Press Key for next record"<<endl;
+	getch();
+	fout.read((char*)&ob,sizeof(ob));
+      }
+
+    }
+    fout.seekg(0,ios::end);
+    int m=fout.tellg();
+    int z=m/sizeof(ob);
+    cout<<"End of file.Total Number of Records.."<<z;
+    cout<<endl<<"Press any key to go back to main Menu"<<endl;
+    fout.close();
+    getch();
+    ShowMenu();
+}
+
+
+void DispP()
+{   FX obx;
+    int p,q,r;
+    ifstream f("Records.dat",ios::binary);
+    cout<<"Enter the record(Player) number to be viewed "<<endl;
+    cin>>p;
+    f.seekg(0,ios::end);
+    q=f.tellg();
+    r=q/sizeof(obx);
+    if(p<=r)
+    { f.seekg((p
+    -1)*sizeof(obx),ios::beg);
+      f.read((char*)&obx,sizeof(obx));
+      obx.show();
+    }
+    else cout<<"Record not found"<<endl;
+      f.close();
+	 getch();
+	 ShowMenu();
+}
+
+
+char input()
+{
+char x;
+cout<<"\nENTER YOUR GUESS PLAYER\n";
+cin>>x;
+return x;
+}
+
+
+
+
+
+int main()
+{ clrscr();
+  ShowHeader();
+  int choice;
+  char p;
+  User user1;
+  char log_usnm[20];
+  char log_pw[20];
+
+  cout<<" ARE YOU A PLAYER OR AN ADMIN(PRESS P/A)"<<endl;
+  cin>>p;
+  if(p=='A'||p=='a')
+  { cout<<"Do you want to add up the words into the file before allowing the";
+cout<<" player to play the game??(y/n)"<<endl;
+		char ch;
+cin>>ch;
+	  if(ch=='y'||ch=='Y')
+{ cout<<"Enter the level in which you want to add up the word(1/2/3)"<<endl;
+  cin>>level;
+  if(level==1)
+  { ofstream fx("LEVEL1.dat",ios::binary|ios::app);
+
+do{      cout<<"Please Enter words based on topic: C++ Concepts"<<endl;
+	 Wr.inl1();
+	 fx.write((char*)&Wr,sizeof(Wr));
+
+	 cout<<"Do you want to continue to add words into this level??(y/n)"<<endl;
+	 cin>>c;
+
+
+
+  }while(c=='Y'||c=='y');
+  fx.close();
+  }
+
+  else if(level==2)
+	 {   ofstream fw("LEVEL2.dat",ios::binary|ios::app);
+
+do{    cout<<"Please Enter Words based on the topic: Countries"<<endl;
+	Wr.inl2();
+	 fw.write((char*)&Wr,sizeof(Wr));
+
+	 cout<<"Do you want to continue to add words into this level??(y/n)"<<endl;
+	 cin>>c;
+
+  }while(c=='Y'||c=='y');
+  fw.close();
+  }
+
+	else if(level==3)
+	{
+	 ofstream fy("LEVEL3.dat",ios::binary|ios::app);
+
+do{	 cout<<"Please Enter Words based on the topic: Wonders of the World"<<endl;
+		   Wr.inl3();
+	 fy.write((char*)&Wr,sizeof(Wr));
+
+	 cout<<"Do you want to continue to add words into this level??(y/n)"<<endl;
+	 cin>>c;
+
+  }while(c=='Y'||c=='y');
+  fy.close();
+  }
+  } }
+  else if(p=='P'||p=='p')
+  {fstream f("Userss.dat",ios::binary|ios::in|ios::out|ios::app);
+  cout<<"\n1.Want to register?(If you are a new user)\n2.Want to Login?(If you are an existing user)\n3.Exit"<<endl;
+  cout<<"Enter your choice"<<endl;
+  cin>>choice;
+ if(choice==1)
+  { cout<<"Welcome New USer!Enter your Details to signn up/Register"<<endl;
+    user1.Enter();
+    f.write((char*)&user1,sizeof(user1));
+	 f.close();
+    ShowMenu();
+  }
+  else if(choice==2)
+  { ifstream f1("Userss.dat",ios::binary);
+    cout<<"You are an existing USer,Login to load your Page:"<<endl;
+    cout<<"Enter Username:"<<endl;
+    gets(log_usnm);
+    cout<<endl;
+    cout<<"Enter Password:"<<endl;
+    gets(log_pw);
+    while(!f1.eof())
+    {  while(f1.read((char*)&user1,sizeof(user1)));
+      if(!strcmp(log_usnm,user1.RetUsnm())&&(!strcmp(log_pw,user1.RetPw())))
+      {cout<<"Login Successful"<<endl;  flag=1;}
+      else { flag=0;
+	   }
+     }
+    f1.close();
+  }
+else
+{ cout<<"\t\tExitedsuccesfully!";
+	getch();
+	exit(0);
+ }
+ while(flag==0)
+{    if(!strcmp(log_usnm,user1.RetUsnm())&&(!strcmp(log_pw,user1.RetPw())))
+       { cout<<"login succesfully"; flag=1;
+	}
+	  else { flag=0;
+	      cout<<"Not Logged in Properly"<<endl;
+	     cout<<"Re-enter your Username/Password "<<endl;
+	     cout<<"Enter Username:"<<endl;
+	     gets(log_usnm); cout<<endl;
+	     cout<<"Enter Password:"<<endl;
+	     gets(log_pw);
+	     }
+
+
+}
+  ShowMenu();
+getch();
+
+}
+return 0;
+} //end of main()
+
+
