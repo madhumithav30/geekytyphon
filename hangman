@@ -564,7 +564,7 @@ return matches;
 void ShowHeader()
 {
 cout<<endl<<"+--------------------------------------------------------------- --------------+";
-cout<<endl<<"| Hangman Game by Abirami-Amrita-Madhumitha-Rashmika-XII-A |";
+cout<<endl<<"| Hangman Game  |";
 cout<<endl<<"+--------------------------------------------------------------- --------------+";
 cout<<endl;
  return;
