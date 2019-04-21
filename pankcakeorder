@@ -16,7 +16,7 @@ void flip(int arr[], int i)
 	} 
 } 
 
-                                                                                                  // Returns index of the maximum element in array
+                                                                                 // Returns index of the maximum element in array
  
 int findMax(int arr[], int n) 
 { 
