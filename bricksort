@@ -1,7 +1,7 @@
 // A C++ Program to implement Odd-Even / Brick Sort 
 
 #include<iostream.h> 
-using namespace std; 
+
 int n;
 void oddEvenSort(int arr[]) 
 { 
