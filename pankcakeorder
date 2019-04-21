@@ -1,0 +1,75 @@
+// pancake sort
+
+#include <iostream.h>
+int n;
+
+ 
+void flip(int arr[], int i) 
+{ 
+	int temp; 
+	for( int j=0;j<i;j++)                                                  // flips entire array till the i th element
+	{ 
+		temp = arr[j]; 
+		arr[j] = arr[i]; 
+		arr[i] = temp;  
+		i--; 
+	} 
+} 
+
+                                                                                                  // Returns index of the maximum element in array
+ 
+int findMax(int arr[], int n) 
+{ 
+int mi=0; 
+for (int i = 0; i < n; ++i) 
+	if (arr[i] > arr[mi]) 
+      {
+         mi = i; 
+      }
+return mi; 
+} 
+
+ 					
+ 
+int pancakeSort(int *arr) 
+{ 
+ 
+	for (int j = n-1; j >=0; --j) 
+	{ 
+		  
+		int mi = findMax(arr,j+1); 		                    //find maximum element 
+
+		 
+		if (mi !=j) 
+		{ 
+			
+			flip(arr, mi);                                // flip the array from maximum array
+      flip(arr,j);                                 // Now move the maximum number to end by reversing
+							                                               
+		} 
+	} 
+} 
+
+ 
+
+void main() 
+{ 
+	int arr[20];
+	cout<<"enter the number of elements";
+	cin>>n;
+	cout<<"\nenter the elements";
+
+	for(int i=0;i<n;i++)
+	{ cin>>a[i];
+	}
+
+	pancakeSort(arr); 
+
+	cout<<"SORTED ARRAY!!!";
+	for(i=0;i<n;i++)
+  {
+	 cout<<a[i]<<"";
+	}
+
+
+} 
